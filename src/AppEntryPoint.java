@@ -1,6 +1,6 @@
 import java.io.IOException;
 
-public class App {
+public class AppEntryPoint {
 
   public static void main(String[] args){
     Joogle app = new Joogle(new String[] {
