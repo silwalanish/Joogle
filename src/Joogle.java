@@ -34,13 +34,15 @@ public class Joogle {
   protected String[] readUrls() throws IOException {
     StringBuffer urlBuffer = new StringBuffer();
     InputStream file = new FileInputStream(urlFilePath);
+
     int chr;
     while ((chr = file.read()) != -1){
       urlBuffer.append((char) chr);
     }
 
-    String[] urls = urlBuffer.toString().split("\n");
-    return urls;
+    file.close();
+
+    return urlBuffer.toString().split("\n");
   }
 
   protected void run() throws IOException {

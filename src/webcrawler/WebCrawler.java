@@ -5,10 +5,7 @@ import pooling.PoolOverflowException;
 import pooling.PoolService;
 import webcrawler.simpleparsing.HTMLContentParser;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -19,6 +16,8 @@ public class WebCrawler extends Thread implements IPoolable {
   protected URL url;
   protected HashMap<String, Integer> freqs;
   protected String[] tags;
+  protected HttpRequest request;
+
   protected long startTime;
   protected long endTime;
 
@@ -38,12 +37,18 @@ public class WebCrawler extends Thread implements IPoolable {
     this.url = url;
     this.tags = tags;
     this.freqs = new HashMap<>();
+    this.request = new HttpRequest(this.url);
 
     this.willExit = false;
     this.isCompleted = false;
     this.isRunning = false;
 
     this.isReady = true;
+  }
+
+  protected void analyze(String response) {
+    String parsedContent = HTMLContentParser.parse(response);
+    this.freqs = (HashMap<String, Integer>) OccurrenceCounter.count(parsedContent, tags);
   }
 
   @Override
@@ -54,20 +59,11 @@ public class WebCrawler extends Thread implements IPoolable {
         isRunning = true;
 
         try {
-          HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-          conn.setRequestMethod("GET");
-
           startTime = System.currentTimeMillis();
-          StringBuffer buffer = new StringBuffer();
-          BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
-          String line;
-          while ((line = reader.readLine()) != null) {
-            buffer.append(line);
-          }
-
-          String parsedContent = HTMLContentParser.parse(buffer.toString());
-          this.freqs = (HashMap<String, Integer>) OccurrenceCounter.count(parsedContent, tags);
+          request.connect();
+          analyze(request.getResponse());
+          request.disconnect();
 
           endTime = System.currentTimeMillis();
 
@@ -107,8 +103,6 @@ public class WebCrawler extends Thread implements IPoolable {
     for (String key: freqs.keySet()) {
       detailOutput += key + " : " + freqs.get(key) + "\n";
     }
-    detailOutput += "Started at: " + startTime + "ms.." + "\n";
-    detailOutput += "Finished at: " + endTime + "ms.." + "\n";
     detailOutput += "Time taken " + (endTime - startTime) + "ms.." + "\n";
     detailOutput += "----------------------------------\n\n";
 
@@ -120,6 +114,7 @@ public class WebCrawler extends Thread implements IPoolable {
     this.url = null;
     this.tags = null;
     this.freqs = new HashMap<>();
+    this.request = null;
 
     this.isCompleted = false;
     this.isRunning = false;
