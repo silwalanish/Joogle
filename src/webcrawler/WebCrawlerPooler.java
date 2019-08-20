@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class WebCrawlerPooler extends PoolService<WebCrawler> {
+public class WebCrawlerPooler extends PoolService<WebCrawler, HashMap<String, Integer>> {
 
   protected ConcurrentMap<String, Integer> analysis;
 
@@ -40,6 +40,7 @@ public class WebCrawlerPooler extends PoolService<WebCrawler> {
     }
   }
 
+  @Override
   public void putResult(HashMap<String, Integer> result) {
     for (String keyword: result.keySet()) {
       analysis.put(keyword, analysis.getOrDefault(keyword, 0) + result.get(keyword));

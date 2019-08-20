@@ -11,7 +11,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-public class WebCrawler extends Thread implements IPoolable {
+public class WebCrawler extends Thread implements IPoolable<WebCrawler, HashMap<String, Integer>> {
 
   protected URL url;
   protected HashMap<String, Integer> freqs;
@@ -26,9 +26,9 @@ public class WebCrawler extends Thread implements IPoolable {
   private boolean isCompleted;
   private boolean willExit;
 
-  private PoolService<WebCrawler> poolService;
+  private PoolService<WebCrawler, HashMap<String, Integer>> poolService;
 
-  public WebCrawler(PoolService<WebCrawler> poolService) {
+  public WebCrawler(PoolService<WebCrawler, HashMap<String, Integer>> poolService) {
     this.poolService = poolService;
     this.willExit = false;
     reset();
@@ -65,7 +65,7 @@ public class WebCrawler extends Thread implements IPoolable {
           endTime = System.currentTimeMillis();
           request.disconnect();
 
-          ((WebCrawlerPooler) getPoolService()).putResult(freqs);
+          getPoolService().putResult(freqs);
         } catch (MalformedURLException e) {
           System.out.println("URL is invalid: " + url.toString());
         } catch (IOException e) {
@@ -129,17 +129,12 @@ public class WebCrawler extends Thread implements IPoolable {
   }
 
   @Override
-  public boolean hasCompleted() {
-    return isCompleted;
-  }
-
-  @Override
   public boolean shouldExit() {
     return willExit;
   }
 
   @Override
-  public PoolService getPoolService() {
+  public PoolService<WebCrawler, HashMap<String, Integer>> getPoolService() {
     return poolService;
   }
 }

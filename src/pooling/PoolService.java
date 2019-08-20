@@ -3,7 +3,7 @@ package pooling;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
-public abstract class PoolService<T extends IPoolable> {
+public abstract class PoolService<T extends IPoolable, R> {
 
   protected final int poolSize;
   protected int stoppedObjs;
@@ -17,7 +17,9 @@ public abstract class PoolService<T extends IPoolable> {
     this.runningObjs = new ConcurrentLinkedDeque<>();
   }
 
-  public abstract void initPool() throws PoolOverflowException;
+  public abstract void initPool();
+
+  public abstract void putResult(R result);
 
   public void addInstance(T obj) throws PoolOverflowException {
     if (pool.size() > poolSize){

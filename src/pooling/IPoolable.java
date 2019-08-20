@@ -1,17 +1,15 @@
 package pooling;
 
-public interface IPoolable<T extends IPoolable> {
+public interface IPoolable<T extends IPoolable, R> {
 
   void reset();
 
   void exit();
 
   boolean isRunning();
-  boolean hasCompleted();
   boolean ready();
   boolean shouldExit();
 
-
-  PoolService<T> getPoolService();
+  PoolService<T, R> getPoolService();
 
 }
