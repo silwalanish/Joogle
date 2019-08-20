@@ -30,6 +30,7 @@ public class WebCrawler extends Thread implements IPoolable {
 
   public WebCrawler(PoolService<WebCrawler> poolService) {
     this.poolService = poolService;
+    this.willExit = false;
     reset();
   }
 
@@ -39,7 +40,6 @@ public class WebCrawler extends Thread implements IPoolable {
     this.freqs = new HashMap<>();
     this.request = new HttpRequest(this.url);
 
-    this.willExit = false;
     this.isCompleted = false;
     this.isRunning = false;
 
@@ -57,17 +57,15 @@ public class WebCrawler extends Thread implements IPoolable {
       if (ready()) {
         isReady = false;
         isRunning = true;
-
+        isCompleted = false;
         try {
-          startTime = System.currentTimeMillis();
-
           request.connect();
+          startTime = System.currentTimeMillis();
           analyze(request.getResponse());
+          endTime = System.currentTimeMillis();
           request.disconnect();
 
-          endTime = System.currentTimeMillis();
-
-          showDetails();
+          ((WebCrawlerPooler) getPoolService()).putResult(freqs);
         } catch (MalformedURLException e) {
           System.out.println("URL is invalid: " + url.toString());
         } catch (IOException e) {
@@ -75,38 +73,31 @@ public class WebCrawler extends Thread implements IPoolable {
         } catch (Exception e) {
           System.out.println("Error : " + url.toString());
         }
-
-        isRunning = false;
-        isCompleted = true;
-
-        try {
-          getPoolService().completed(this);
-        } catch (PoolOverflowException e) {
-          e.printStackTrace();
-        }
+        setCompleted();
       }
-
       try {
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.MILLISECONDS.sleep(20);
       } catch (InterruptedException e) {
         if (isInterrupted()) {
           isReady = true;
         }
       }
     }
+    if (!isCompleted) {
+      setCompleted();
+    }
+    getPoolService().stopped(this);
   }
 
-  public void showDetails() {
-    String detailOutput = "";
-    detailOutput += "----------------------------------\n";
-    detailOutput += "Details of  " + url + "\n";
-    for (String key: freqs.keySet()) {
-      detailOutput += key + " : " + freqs.get(key) + "\n";
-    }
-    detailOutput += "Time taken " + (endTime - startTime) + "ms.." + "\n";
-    detailOutput += "----------------------------------\n\n";
+  protected void setCompleted() {
+    isRunning = false;
+    isCompleted = true;
 
-    System.out.println(detailOutput);
+    try {
+      getPoolService().completed(this);
+    } catch (PoolOverflowException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override

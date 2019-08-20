@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class Joogle {
 
@@ -22,9 +23,13 @@ public class Joogle {
   }
 
   public void start () throws IOException {
+    long startTime = System.currentTimeMillis();
     init();
     run();
     cleanup();
+
+    pooler.showDetails();
+    System.out.println("TOTAL TIME: " + (System.currentTimeMillis() - startTime) + "ms.");
   }
 
   protected void init () {
@@ -57,6 +62,14 @@ public class Joogle {
 
   protected void cleanup() {
     pooler.cleanup();
+
+    while (pooler.getNumStoppedObjs() != pooler.getPoolSize()){
+      try {
+        TimeUnit.MILLISECONDS.sleep(20);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
 }

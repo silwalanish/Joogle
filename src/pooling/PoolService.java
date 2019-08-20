@@ -1,18 +1,20 @@
 package pooling;
 
-import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
 public abstract class PoolService<T extends IPoolable> {
 
   protected final int poolSize;
-  private LinkedList<T> pool;
-  private LinkedList<T> runningObjs;
+  protected int stoppedObjs;
+  private ConcurrentLinkedDeque<T> pool;
+  private ConcurrentLinkedDeque<T> runningObjs;
 
   public PoolService(int poolSize) {
     this.poolSize = poolSize;
-    this.pool = new LinkedList<T>();
-    this.runningObjs = new LinkedList<T>();
+    this.stoppedObjs = 0;
+    this.pool = new ConcurrentLinkedDeque<>();
+    this.runningObjs = new ConcurrentLinkedDeque<>();
   }
 
   public abstract void initPool() throws PoolOverflowException;
@@ -27,14 +29,18 @@ public abstract class PoolService<T extends IPoolable> {
   public T getInstance() {
     while (true) {
       if (!pool.isEmpty()) {
-        T freeObj = pool.poll();
-        freeObj.reset();
-        runningObjs.add(freeObj);
-        return freeObj;
+        try {
+          T freeObj = pool.poll();
+          freeObj.reset();
+          runningObjs.add(freeObj);
+          return freeObj;
+        } catch (NullPointerException e) {
+          System.out.println(pool.size());
+        }
       }
 
       try {
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(20);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
@@ -43,17 +49,22 @@ public abstract class PoolService<T extends IPoolable> {
 
   public void completed(T obj) throws PoolOverflowException {
     runningObjs.removeFirstOccurrence(obj);
-    obj.reset();
     addInstance(obj);
+  }
+
+  public void stopped(T obj) {
+    if (obj.shouldExit()) {
+      stoppedObjs++;
+    }
   }
 
   public abstract void run(T obj);
 
   public void cleanup() {
-    for (T obj: pool) {
+    for (T obj : runningObjs) {
       obj.exit();
     }
-    for (T obj: runningObjs) {
+    for (T obj : pool) {
       obj.exit();
     }
   }
@@ -62,12 +73,16 @@ public abstract class PoolService<T extends IPoolable> {
     return poolSize;
   }
 
-  public final int getNumObjRunning() {
+  public final int getNumRunningObjs() {
     return runningObjs.size();
   }
 
-  public final int getNumObjPooled() {
+  public final int getNumPooledObjs() {
     return poolSize - runningObjs.size();
+  }
+
+  public final int getNumStoppedObjs() {
+    return stoppedObjs;
   }
 
 }
