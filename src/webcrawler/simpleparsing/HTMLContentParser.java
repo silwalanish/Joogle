@@ -6,8 +6,6 @@ public class HTMLContentParser {
     int bodyIndex = html.indexOf("<body>");
 
     return html.substring(bodyIndex)
-            .strip()
-            .replaceAll("\\s{2,}", " ")
             .replaceAll("<[^>]*>", "")
             .toLowerCase();
   }
