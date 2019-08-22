@@ -3,7 +3,8 @@ import java.io.IOException;
 public class AppEntryPoint {
 
   public static void main(String[] args){
-    Joogle app = new Joogle(new String[] {
+
+    Joogle app = new Joogle(new String[]{
             "JAVA",
             "Oracle"
     }, "./urls.txt", 10);

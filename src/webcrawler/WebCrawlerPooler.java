@@ -31,12 +31,18 @@ public class WebCrawlerPooler extends PoolService<WebCrawler, HashMap<String, In
 
   @Override
   public void run(WebCrawler obj) {
-//    System.out.println("Max Pool Size: " + getPoolSize());
-//    System.out.println("Running Objects: " + getNumObjRunning());
-//    System.out.println("Pooled Objects: " + getNumObjPooled());
 
     if (!obj.isRunning()) {
       obj.interrupt();
+    }
+  }
+
+  @Override
+  public void postCleanUp(WebCrawler obj) {
+    try {
+      obj.join();
+    } catch (InterruptedException e) {
+      // Ignore
     }
   }
 

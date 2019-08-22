@@ -7,9 +7,11 @@ public class HTMLContentParser {
     int bodyIndex = html.indexOf("<body>");
     if (bodyIndex != -1) {
       return html.substring(bodyIndex)
-              .replaceAll("<[^>]*>", "");
+              .replaceAll("<[^>]*>", "")
+              .replaceAll("\\s{2,}", " ");
     }else{
-      return html.replaceAll("<[^>]*>", "");
+      return html.replaceAll("<[^>]*>", "")
+              .replaceAll("\\s{2,}", " ");
     }
   }
 

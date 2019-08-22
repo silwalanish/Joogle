@@ -6,13 +6,11 @@ import java.util.concurrent.TimeUnit;
 public abstract class PoolService<T extends IPoolable, R> {
 
   protected final int poolSize;
-  protected int stoppedObjs;
   private ConcurrentLinkedDeque<T> pool;
   private ConcurrentLinkedDeque<T> runningObjs;
 
   public PoolService(int poolSize) {
     this.poolSize = poolSize;
-    this.stoppedObjs = 0;
     this.pool = new ConcurrentLinkedDeque<>();
     this.runningObjs = new ConcurrentLinkedDeque<>();
   }
@@ -56,7 +54,7 @@ public abstract class PoolService<T extends IPoolable, R> {
 
   public void stopped(T obj) {
     if (obj.shouldExit()) {
-      stoppedObjs++;
+      pool.remove(obj);
     }
   }
 
@@ -68,8 +66,16 @@ public abstract class PoolService<T extends IPoolable, R> {
     }
     for (T obj : pool) {
       obj.exit();
+      pool.remove(obj);
+      postCleanUp(obj);
+    }
+    for (T obj: runningObjs) {
+      runningObjs.remove(obj);
+      postCleanUp(obj);
     }
   }
+
+  public abstract void postCleanUp(T obj);
 
   public final int getPoolSize() {
     return poolSize;
@@ -81,10 +87,6 @@ public abstract class PoolService<T extends IPoolable, R> {
 
   public final int getNumPooledObjs() {
     return poolSize - runningObjs.size();
-  }
-
-  public final int getNumStoppedObjs() {
-    return stoppedObjs;
   }
 
 }

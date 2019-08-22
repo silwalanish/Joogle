@@ -75,12 +75,16 @@ public class WebCrawler extends Thread implements IPoolable<WebCrawler, HashMap<
         }
         setCompleted();
       }
-      try {
-        TimeUnit.MILLISECONDS.sleep(20);
-      } catch (InterruptedException e) {
-        if (isInterrupted()) {
-          isReady = true;
+      if (!isInterrupted()) {
+        try {
+          TimeUnit.MILLISECONDS.sleep(20);
+        } catch (InterruptedException e) {
+          if (isInterrupted()) {
+            isReady = true;
+          }
         }
+      } else {
+        isReady = true;
       }
     }
     if (!isCompleted) {
@@ -137,4 +141,5 @@ public class WebCrawler extends Thread implements IPoolable<WebCrawler, HashMap<
   public PoolService<WebCrawler, HashMap<String, Integer>> getPoolService() {
     return poolService;
   }
+
 }

@@ -62,14 +62,6 @@ public class Joogle {
 
   protected void cleanup() {
     pooler.cleanup();
-
-    while (pooler.getNumStoppedObjs() != pooler.getPoolSize()){
-      try {
-        TimeUnit.MILLISECONDS.sleep(20);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
   }
 
 }
