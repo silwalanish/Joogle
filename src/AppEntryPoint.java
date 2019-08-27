@@ -1,9 +1,9 @@
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 public class AppEntryPoint {
 
-  public static void main(String[] args){
-
+  public static void main(String[] args) throws MalformedURLException {
     Joogle app = new Joogle(new String[]{
             "JAVA",
             "Oracle"

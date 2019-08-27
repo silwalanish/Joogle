@@ -1,5 +1,6 @@
 package webcrawler;
 
+import models.OverallStats;
 import pooling.PoolOverflowException;
 import pooling.PoolService;
 
@@ -50,6 +51,20 @@ public class WebCrawlerPooler extends PoolService<WebCrawler, HashMap<String, In
   public void putResult(HashMap<String, Integer> result) {
     for (String keyword: result.keySet()) {
       analysis.put(keyword, analysis.getOrDefault(keyword, 0) + result.get(keyword));
+    }
+  }
+
+  public void saveResult() {
+    for (String key: analysis.keySet()) {
+      OverallStats stats = new OverallStats().where("keyword", "=", key).first();
+      if (stats != null) {
+        stats.setCount(analysis.get(key));
+      } else {
+        stats = new OverallStats();
+        stats.setKeyword(key);
+        stats.setCount(analysis.get(key));
+      }
+      stats.save();
     }
   }
 

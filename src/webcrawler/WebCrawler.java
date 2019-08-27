@@ -1,5 +1,6 @@
 package webcrawler;
 
+import models.UrlStats;
 import pooling.IPoolable;
 import pooling.PoolOverflowException;
 import pooling.PoolService;
@@ -65,6 +66,18 @@ public class WebCrawler extends Thread implements IPoolable<WebCrawler, HashMap<
           endTime = System.currentTimeMillis();
           request.disconnect();
 
+          for (String keyword: freqs.keySet()) {
+            UrlStats stats = new UrlStats().where("url", "=", url).andWhere("keyword", "=", keyword).first();
+            if (stats != null) {
+              stats.setCount(freqs.get(keyword));
+            } else {
+              stats = new UrlStats();
+              stats.setUrl(url);
+              stats.setKeyword(keyword);
+              stats.setCount(freqs.get(keyword));
+            }
+            stats.save();
+          }
           getPoolService().putResult(freqs);
         } catch (MalformedURLException e) {
           System.out.println("URL is invalid: " + url.toString());

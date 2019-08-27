@@ -26,7 +26,7 @@ public abstract class PoolService<T extends IPoolable, R> {
     pool.add(obj);
   }
 
-  public T getInstance() {
+  public T aquirePooledInstance() {
     while (true) {
       if (!pool.isEmpty()) {
         try {

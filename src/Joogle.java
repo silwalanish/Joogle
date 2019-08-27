@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 
 public class Joogle {
 
@@ -30,6 +29,7 @@ public class Joogle {
 
     pooler.showDetails();
     System.out.println("TOTAL TIME: " + (System.currentTimeMillis() - startTime) + "ms.");
+    pooler.saveResult();
   }
 
   protected void init () {
@@ -54,7 +54,7 @@ public class Joogle {
     String [] urls = readUrls();
 
     for (String url: urls){
-      WebCrawler webCrawler = pooler.getInstance();
+      WebCrawler webCrawler = pooler.aquirePooledInstance();
       webCrawler.init(new URL(url), keywords);
       pooler.run(webCrawler);
     }
