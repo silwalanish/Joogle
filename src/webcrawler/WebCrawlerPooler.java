@@ -49,8 +49,10 @@ public class WebCrawlerPooler extends PoolService<WebCrawler, HashMap<String, In
 
   @Override
   public void putResult(HashMap<String, Integer> result) {
-    for (String keyword: result.keySet()) {
-      analysis.put(keyword, analysis.getOrDefault(keyword, 0) + result.get(keyword));
+    synchronized (analysis) {
+      for (String keyword : result.keySet()) {
+        analysis.put(keyword, analysis.getOrDefault(keyword, 0) + result.get(keyword));
+      }
     }
   }
 

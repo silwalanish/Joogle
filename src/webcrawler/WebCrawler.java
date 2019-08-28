@@ -79,12 +79,11 @@ public class WebCrawler extends Thread implements IPoolable<WebCrawler, HashMap<
             stats.save();
           }
           getPoolService().putResult(freqs);
+          System.out.println("DONE: " + url);
         } catch (MalformedURLException e) {
-          System.out.println("URL is invalid: " + url.toString());
+          System.err.println("URL is invalid: " + url.toString());
         } catch (IOException e) {
-          System.out.println("Could not open URL: " + url.toString());
-        } catch (Exception e) {
-          System.out.println("Error : " + url.toString());
+          System.err.println("Could not open URL: " + url.toString());
         }
         setCompleted();
       }

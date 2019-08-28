@@ -5,7 +5,7 @@ import pooling.PoolService;
 
 public class DBConnectionPooler extends PoolService<DBConnection, Object> {
 
-  private static final DBConnectionPooler INSTANCE = new DBConnectionPooler(10);
+  private static final DBConnectionPooler INSTANCE = new DBConnectionPooler(20);
 
   public static DBConnection getConnection() {
     return INSTANCE.aquirePooledInstance();

@@ -3,7 +3,6 @@ package orm;
 import orm.utils.StringUtils;
 import pooling.PoolOverflowException;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;

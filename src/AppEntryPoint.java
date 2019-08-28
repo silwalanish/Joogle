@@ -7,7 +7,7 @@ public class AppEntryPoint {
     Joogle app = new Joogle(new String[]{
             "JAVA",
             "Oracle"
-    }, "./urls.txt", 10);
+    }, "./urls-1000.txt", 10);
     try {
       app.start();
     } catch (IOException e) {

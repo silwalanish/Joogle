@@ -18,6 +18,7 @@ public class HttpRequest {
   public void connect() throws IOException {
     connection = (HttpURLConnection) url.openConnection();
     connection.setRequestMethod("GET");
+    connection.setConnectTimeout(500);
   }
 
   public String getResponse() throws IOException {
@@ -35,7 +36,10 @@ public class HttpRequest {
   }
 
   public void disconnect() {
-    connection.disconnect();
+    if (connection != null) {
+      connection.disconnect();
+      connection = null;
+    }
   }
 
 }
