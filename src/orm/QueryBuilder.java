@@ -12,12 +12,6 @@ public abstract class QueryBuilder {
 
   private StringBuilder query = new StringBuilder();
 
-  protected abstract String getTableName();
-
-  protected abstract <T> T parseRow(Map<String, Object> row);
-
-  protected abstract Map<String, Object> serialize();
-
   public QueryBuilder select() {
     return select(null);
   }
@@ -93,6 +87,60 @@ public abstract class QueryBuilder {
     return this;
   }
 
+  public QueryBuilder update() {
+    update(serialize());
+
+    return this;
+  }
+
+  public QueryBuilder update(Map<String, Object> values) {
+    query = new StringBuilder();
+
+    query.append("UPDATE ");
+    query.append(getTableName());
+    query.append(" SET ");
+
+    query.append(StringUtils.keyEqualsValue(values));
+
+    return this;
+  }
+
+  public QueryBuilder delete() {
+    query = new StringBuilder();
+    query.append("DELETE FROM ");
+    query.append(getTableName());
+
+    return this;
+  }
+
+  public int insert(String[] columns, List<List<Object>> values) throws SQLException {
+    query = new StringBuilder();
+    query.append("INSERT INTO ");
+    query.append(getTableName());
+
+    if (columns != null || columns.length > 0) {
+      query.append("(");
+      query.append(StringUtils.flattenArray(columns));
+      query.append(")");
+    }
+
+    query.append(" VALUES ");
+
+    int rowIndex = 0;
+    int rowCount = values.size();
+    for (List<Object> row: values) {
+      query.append("(");
+      query.append(StringUtils.singleQuoted(row));
+      query.append(")");
+      if(rowIndex < rowCount - 1) {
+        query.append(", ");
+      }
+      rowIndex++;
+    }
+
+    return commit();
+  }
+
   protected ResultSet run() throws SQLException {
 
     DBConnection conn = DBConnectionPooler.getConnection();
@@ -133,72 +181,22 @@ public abstract class QueryBuilder {
     return null;
   }
 
-  public QueryBuilder update() {
-    update(serialize());
-
-    return this;
-  }
-
-  public QueryBuilder update(Map<String, Object> values) {
-    query = new StringBuilder();
-
-    query.append("UPDATE ");
-    query.append(getTableName());
-    query.append(" SET ");
-
-    query.append(StringUtils.keyEqualsValue(values));
-
-    return this;
-  }
-
-  public int insert(String[] columns, List<List<Object>> values) {
-    query = new StringBuilder();
-    query.append("INSERT INTO ");
-    query.append(getTableName());
-
-    if (columns != null || columns.length > 0) {
-      query.append("(");
-      query.append(StringUtils.flattenArray(columns));
-      query.append(")");
-    }
-
-    query.append(" VALUES ");
-
-    int rowIndex = 0;
-    int rowCount = values.size();
-    for (List<Object> row: values) {
-      query.append("(");
-      query.append(StringUtils.singleQuoted(row));
-      query.append(")");
-      if(rowIndex < rowCount - 1) {
-        query.append(", ");
-      }
-      rowIndex++;
-    }
-
-    return commit();
-  }
-
-  public QueryBuilder delete() {
-    query = new StringBuilder();
-    query.append("DELETE FROM ");
-    query.append(getTableName());
-
-    return this;
-  }
-
-  public int commit() {
+  public int commit() throws SQLException {
     int count = 0;
     try {
       DBConnection conn = DBConnectionPooler.getConnection();
       count = conn.getConnection().createStatement().executeUpdate(query.toString());
       conn.getPoolService().completed(conn);
-    } catch (SQLException e) {
-      e.printStackTrace();
     } catch (PoolOverflowException e) {
       e.printStackTrace();
     }
     return count;
   }
+
+  protected abstract String getTableName();
+
+  protected abstract <T> T parseRow(Map<String, Object> row);
+
+  protected abstract Map<String, Object> serialize();
 
 }

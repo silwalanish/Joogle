@@ -1,5 +1,6 @@
 package orm;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +17,14 @@ public abstract class Model extends QueryBuilder {
   }
 
   public void save() {
-    if (saved && changed) {
-      update().where("id", "=", this.id).commit();
-    } else if(!saved) {
-      insert(getColumns(), Arrays.asList(asList()));
+    try {
+      if (saved && changed) {
+        update().where("id", "=", this.id).commit();
+      } else if(!saved) {
+        insert(getColumns(), Arrays.asList(asList()));
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
     this.changed = false;
   }
