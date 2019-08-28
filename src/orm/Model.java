@@ -7,6 +7,8 @@ import java.util.Map;
 
 public abstract class Model extends QueryBuilder {
 
+  private static final String ID_COLUMN = "id";
+
   protected int id;
   protected boolean saved = false;
   protected boolean changed = false;
@@ -19,7 +21,7 @@ public abstract class Model extends QueryBuilder {
   public void save() {
     try {
       if (saved && changed) {
-        update().where("id", "=", this.id).commit();
+        update().where(getIdField(), "=", this.id).commit();
       } else if(!saved) {
         insert(getColumns(), Arrays.asList(asList()));
       }
@@ -31,7 +33,11 @@ public abstract class Model extends QueryBuilder {
 
   @Override
   public QueryBuilder delete() {
-    return super.delete().where("id", "=", this.id);
+    return super.delete().where(getIdField(), "=", this.id);
+  }
+
+  public String getIdField() {
+    return ID_COLUMN;
   }
 
   public int getId() {
@@ -52,7 +58,7 @@ public abstract class Model extends QueryBuilder {
   protected abstract String[] getColumns();
 
   public <T> T find(int id) {
-    return select().where("id", "=", id).first();
+    return select().where(getIdField(), "=", id).first();
   }
 
 }
