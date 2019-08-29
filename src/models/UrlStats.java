@@ -5,14 +5,11 @@ import orm.Model;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UrlStats extends Model {
 
-  private static final String[] COLUMNS =  new String[] { "url", "keyword", "count", "created_at" };
+  private static final List<String> COLUMNS = Arrays.asList("url", "keyword", "count", "created_at");
   private static final String TABLE_NAME = "url_stats";
 
   private URL url;
@@ -59,7 +56,7 @@ public class UrlStats extends Model {
     return count;
   }
 
-  public Timestamp getCreated_at() {
+  public Timestamp getCreatedAt() {
     return created_at;
   }
 
@@ -89,7 +86,7 @@ public class UrlStats extends Model {
   }
 
   @Override
-  protected String[] getColumns() {
+  protected List<String> getColumns() {
     return COLUMNS;
   }
 

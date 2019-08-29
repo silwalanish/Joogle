@@ -6,10 +6,10 @@ import java.util.Set;
 
 public class StringUtils {
 
-  public static StringBuilder flattenArray(String[] array) {
+  public static StringBuilder flattenList(List<String> array) {
     StringBuilder builder = new StringBuilder();
     int count = 0;
-    int len = array.length;
+    int len = array.size();
     for (String column : array) {
       builder.append(column);
       if (count < len - 1) {
@@ -22,14 +22,14 @@ public class StringUtils {
     return builder;
   }
 
-  public static StringBuilder singleQuoted(List<Object> list) {
+  public static StringBuilder insertValueFormat(List<String> columns, Map<String, Object> values) {
     StringBuilder builder = new StringBuilder();
 
     int valueIndex = 0;
-    int len = list.size();
-    for (Object value: list) {
+    int len = columns.size();
+    for (String column: columns) {
       builder.append("'");
-      builder.append(value);
+      builder.append(values.get(column));
       builder.append("'");
       if(valueIndex < len - 1){
         builder.append(", ");

@@ -3,14 +3,11 @@ package models;
 import orm.Model;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OverallStats extends Model {
 
-  private static final String[] COLUMNS =  new String[] { "keyword", "count", "created_at" };
+  private static final List<String> COLUMNS = Arrays.asList("keyword", "count", "created_at");
   private static final String TABLE_NAME = "ovrall_stats";
 
   private String keyword;
@@ -46,7 +43,7 @@ public class OverallStats extends Model {
     return count;
   }
 
-  public Timestamp getCreated_at() {
+  public Timestamp getCreatedAt() {
     return created_at;
   }
 
@@ -70,7 +67,7 @@ public class OverallStats extends Model {
   }
 
   @Override
-  protected String[] getColumns() {
+  protected List<String> getColumns() {
     return COLUMNS;
   }
 

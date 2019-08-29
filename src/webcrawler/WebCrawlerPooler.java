@@ -58,7 +58,9 @@ public class WebCrawlerPooler extends PoolService<WebCrawler, HashMap<String, In
 
   public void saveResult() {
     for (String key: analysis.keySet()) {
-      OverallStats stats = new OverallStats().where("keyword", "=", key).first();
+      OverallStats stats = (OverallStats) new OverallStats()
+              .where("keyword", "=", key)
+              .first();
       if (stats != null) {
         stats.setCount(analysis.get(key));
       } else {

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Model extends QueryBuilder {
+public abstract class Model extends QueryBuilder<Model> {
 
   private static final String ID_COLUMN = "id";
 
@@ -23,7 +23,7 @@ public abstract class Model extends QueryBuilder {
       if (saved && changed) {
         update().where(getIdField(), "=", this.id).commit();
       } else if(!saved) {
-        insert(getColumns(), Arrays.asList(asList()));
+        insert(getColumns(), Arrays.asList(serialize()));
       }
     } catch (SQLException e) {
       e.printStackTrace();
@@ -36,6 +36,13 @@ public abstract class Model extends QueryBuilder {
     return super.delete().where(getIdField(), "=", this.id);
   }
 
+  @Override
+  protected Model parseRow(Map<String, Object> row) {
+    Model obj = parse(row);
+    obj.saved = true;
+    return obj;
+  }
+
   public String getIdField() {
     return ID_COLUMN;
   }
@@ -44,21 +51,22 @@ public abstract class Model extends QueryBuilder {
     return id;
   }
 
-  @Override
-  protected <T> T parseRow(Map<String, Object> row) {
-    Model obj = parse(row);
-    obj.saved = true;
-    return (T) obj;
+  public Model find(int id) {
+    return (Model) select().where(getIdField(), "=", id).first();
+  }
+
+  public Model update() {
+    update(serialize());
+
+    return this;
   }
 
   protected abstract Model parse(Map<String, Object> data);
 
   protected abstract List<Object> asList();
 
-  protected abstract String[] getColumns();
+  protected abstract List<String> getColumns();
 
-  public <T> T find(int id) {
-    return select().where(getIdField(), "=", id).first();
-  }
+  protected abstract Map<String, Object> serialize();
 
 }

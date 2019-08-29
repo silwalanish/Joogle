@@ -8,7 +8,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
 
-public abstract class QueryBuilder {
+public abstract class QueryBuilder<T> {
 
   private StringBuilder query = new StringBuilder();
 
@@ -16,14 +16,14 @@ public abstract class QueryBuilder {
     return select(null);
   }
 
-  public QueryBuilder select(String[] columns) {
+  public QueryBuilder select(List<String> columns) {
     query = new StringBuilder();
     query.append("SELECT ");
 
-    if (columns == null || columns.length == 0) {
+    if (columns == null || columns.size() == 0) {
       query.append("* ");
     } else {
-      query.append(StringUtils.flattenArray(columns));
+      query.append(StringUtils.flattenList(columns));
     }
 
     query.append("FROM ");
@@ -76,19 +76,13 @@ public abstract class QueryBuilder {
   }
 
   public QueryBuilder orderBy(String column, String order) {
-    return orderBy(new String[] { column }, order);
+    return orderBy(Arrays.asList(column ), order);
   }
 
-  public QueryBuilder orderBy(String[] columns, String order) {
+  public QueryBuilder orderBy(List<String> columns, String order) {
     query.append("ORDER BY ");
-    query.append(StringUtils.flattenArray(columns));
+    query.append(StringUtils.flattenList(columns));
     query.append(order);
-
-    return this;
-  }
-
-  public QueryBuilder update() {
-    update(serialize());
 
     return this;
   }
@@ -113,14 +107,14 @@ public abstract class QueryBuilder {
     return this;
   }
 
-  public int insert(String[] columns, List<List<Object>> values) throws SQLException {
+  public int insert(List<String> columns, List<Map<String, Object>> values) throws SQLException {
     query = new StringBuilder();
     query.append("INSERT INTO ");
     query.append(getTableName());
 
-    if (columns != null || columns.length > 0) {
+    if (columns != null || columns.size() > 0) {
       query.append("(");
-      query.append(StringUtils.flattenArray(columns));
+      query.append(StringUtils.flattenList(columns));
       query.append(")");
     }
 
@@ -128,9 +122,9 @@ public abstract class QueryBuilder {
 
     int rowIndex = 0;
     int rowCount = values.size();
-    for (List<Object> row: values) {
+    for (Map<String, Object> row: values) {
       query.append("(");
-      query.append(StringUtils.singleQuoted(row));
+      query.append(StringUtils.insertValueFormat(columns, row));
       query.append(")");
       if(rowIndex < rowCount - 1) {
         query.append(", ");
@@ -142,7 +136,6 @@ public abstract class QueryBuilder {
   }
 
   protected ResultSet run() throws SQLException {
-
     DBConnection conn = DBConnectionPooler.getConnection();
     ResultSet set = conn.getConnection().createStatement().executeQuery(query.toString());
     try {
@@ -154,7 +147,7 @@ public abstract class QueryBuilder {
     return set;
   }
 
-  public <T> List<T> get() {
+  public List<T> get() {
     List<T> result = new LinkedList<>();
     try {
       ResultSet queryResult = run();
@@ -173,10 +166,10 @@ public abstract class QueryBuilder {
     return result;
   }
 
-  public <T> T first() {
+  public T first() {
     List<T> result = get();
     if (result.size() > 0) {
-      return (T) result.get(0);
+      return result.get(0);
     }
     return null;
   }
@@ -195,8 +188,6 @@ public abstract class QueryBuilder {
 
   protected abstract String getTableName();
 
-  protected abstract <T> T parseRow(Map<String, Object> row);
-
-  protected abstract Map<String, Object> serialize();
+  protected abstract T parseRow(Map<String, Object> row);
 
 }

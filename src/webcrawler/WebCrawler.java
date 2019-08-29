@@ -67,7 +67,10 @@ public class WebCrawler extends Thread implements IPoolable<WebCrawler, HashMap<
           request.disconnect();
 
           for (String keyword: freqs.keySet()) {
-            UrlStats stats = new UrlStats().where("url", "=", url).andWhere("keyword", "=", keyword).first();
+            UrlStats stats = (UrlStats) new UrlStats()
+                    .where("url", "=", url)
+                    .andWhere("keyword", "=", keyword)
+                    .first();
             if (stats != null) {
               stats.setCount(freqs.get(keyword));
             } else {
