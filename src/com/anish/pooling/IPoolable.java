@@ -1,4 +1,4 @@
-package pooling;
+package com.anish.pooling;
 
 public interface IPoolable<T extends IPoolable, R> {
 

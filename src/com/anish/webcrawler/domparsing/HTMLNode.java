@@ -1,4 +1,4 @@
-package webcrawler.domparsing;
+package com.anish.webcrawler.domparsing;
 
 import java.util.*;
 

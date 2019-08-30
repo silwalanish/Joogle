@@ -1,8 +1,8 @@
-package webcrawler;
+package com.anish.webcrawler;
 
 import models.OverallStats;
-import pooling.PoolOverflowException;
-import pooling.PoolService;
+import com.anish.pooling.PoolOverflowException;
+import com.anish.pooling.PoolService;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;

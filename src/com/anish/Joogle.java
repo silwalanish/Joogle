@@ -1,5 +1,7 @@
-import webcrawler.WebCrawler;
-import webcrawler.WebCrawlerPooler;
+package com.anish;
+
+import com.anish.webcrawler.WebCrawler;
+import com.anish.webcrawler.WebCrawlerPooler;
 
 import java.io.FileInputStream;
 import java.io.IOException;

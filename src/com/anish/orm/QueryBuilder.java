@@ -1,7 +1,7 @@
 package orm;
 
 import orm.utils.StringUtils;
-import pooling.PoolOverflowException;
+import com.anish.pooling.PoolOverflowException;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

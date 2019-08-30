@@ -1,7 +1,7 @@
 package orm;
 
-import pooling.PoolOverflowException;
-import pooling.PoolService;
+import com.anish.pooling.PoolOverflowException;
+import com.anish.pooling.PoolService;
 
 public class DBConnectionPooler extends PoolService<DBConnection, Object> {
 

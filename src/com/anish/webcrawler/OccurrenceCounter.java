@@ -1,4 +1,4 @@
-package webcrawler;
+package com.anish.webcrawler;
 
 import java.util.HashMap;
 import java.util.Map;

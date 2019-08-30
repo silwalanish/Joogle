@@ -1,10 +1,10 @@
-package webcrawler;
+package com.anish.webcrawler;
 
 import models.UrlStats;
-import pooling.IPoolable;
-import pooling.PoolOverflowException;
-import pooling.PoolService;
-import webcrawler.simpleparsing.HTMLContentParser;
+import com.anish.pooling.IPoolable;
+import com.anish.pooling.PoolOverflowException;
+import com.anish.pooling.PoolService;
+import com.anish.webcrawler.simpleparsing.HTMLContentParser;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

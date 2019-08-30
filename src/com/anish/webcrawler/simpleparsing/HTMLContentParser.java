@@ -1,4 +1,4 @@
-package webcrawler.simpleparsing;
+package com.anish.webcrawler.simpleparsing;
 
 public class HTMLContentParser {
 

@@ -1,7 +1,7 @@
 package orm;
 
-import pooling.IPoolable;
-import pooling.PoolService;
+import com.anish.pooling.IPoolable;
+import com.anish.pooling.PoolService;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
